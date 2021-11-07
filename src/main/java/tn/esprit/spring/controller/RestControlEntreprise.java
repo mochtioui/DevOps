@@ -1,171 +1,71 @@
-package tn.esprit.spring.controller;
-
-
-import java.util.Date;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import tn.esprit.spring.dto.ContratDTO;
-import tn.esprit.spring.dto.EmployeDTO;
-import tn.esprit.spring.entities.Employe;
+import tn.esprit.spring.entities.Departement;
 import tn.esprit.spring.entities.Entreprise;
-import tn.esprit.spring.entities.Mission;
-import tn.esprit.spring.entities.Timesheet;
 import tn.esprit.spring.services.IEmployeService;
 import tn.esprit.spring.services.IEntrepriseService;
 import tn.esprit.spring.services.ITimesheetService;
 
 @RestController
-public class RestControlEmploye {
+public class RestControlEntreprise {
 
-	@Autowired
-	IEmployeService iemployeservice;
-	@Autowired
-	IEntrepriseService ientrepriseservice;
+	@@ -31,53 +29,59 @@
 	@Autowired
 	ITimesheetService itimesheetservice;
 
-	
-	
-	@PostMapping("/ajouterEmployer")
+	// Ajouter Entreprise : http://localhost:8081/SpringMVC/servlet/ajouterEntreprise
+	//{"id":1,"name":"SSII Consulting","raisonSocial":"Cite El Ghazela"}
+
+	@PostMapping("/ajouterEntreprise")
 	@ResponseBody
-	public EmployeDTO ajouterEmploye(@RequestBody EmployeDTO employeDto)
-	{
-		iemployeservice.addOrUpdateEmploye(employeDto);
-		return employeDto;
-	}
-	
-	@PutMapping(value = "/modifyEmail/{id}/{newemail}") 
-	@ResponseBody
-	public void mettreAjourEmailByEmployeId(@PathVariable("newemail") String email, @PathVariable("id") int employeId) {
-		iemployeservice.mettreAjourEmailByEmployeId(email, employeId);
-		
+	public int ajouterEntreprise(@RequestBody Entreprise ssiiConsulting) {
+		ientrepriseservice.ajouterEntreprise(ssiiConsulting);
+		return ssiiConsulting.getId();
 	}
 
-	@PutMapping(value = "/affecterEmployeADepartement/{idemp}/{iddept}") 
-	public void affecterEmployeADepartement(@PathVariable("idemp")int employeId, @PathVariable("iddept")int depId) {
-		iemployeservice.affecterEmployeADepartement(employeId, depId);
-		
-	}
-	
-	@PutMapping(value = "/desaffecterEmployeDuDepartement/{idemp}/{iddept}") 
-	public void desaffecterEmployeDuDepartement(@PathVariable("idemp")int employeId, @PathVariable("iddept")int depId)
-	{
-		iemployeservice.desaffecterEmployeDuDepartement(employeId, depId);
+	// http://localhost:8081/SpringMVC/servlet/affecterDepartementAEntreprise/1/1
+    @PutMapping(value = "/affecterDepartementAEntreprise/{iddept}/{identreprise}") 
+	public void affecterDepartementAEntreprise(@PathVariable("iddept")int depId, @PathVariable("identreprise")int entrepriseId) {
+		ientrepriseservice.affecterDepartementAEntreprise(depId, entrepriseId);
 	}
 
-
-	@PostMapping("/ajouterContrat")
-	@ResponseBody
-	public int ajouterContrat(@RequestBody ContratDTO contratDto) {
-		iemployeservice.ajouterContrat(contratDto);
-		return contratDto.getReference();
-	}
-	
-	
-   @PutMapping(value = "/affecterContratAEmploye/{idcontrat}/{idemp}") 
-	public void affecterContratAEmploye(@PathVariable("idcontrat")int contratId, @PathVariable("idemp")int employeId)
-	{
-		iemployeservice.affecterContratAEmploye(contratId, employeId);
-	}
-
-	
-   
-   @GetMapping(value = "getEmployePrenomById/{idemp}")
-   @ResponseBody
-   public String getEmployePrenomById(@PathVariable("idemp")int employeId) {
-		return iemployeservice.getEmployePrenomById(employeId);
-	}
-
-    @DeleteMapping("/deleteEmployeById/{idemp}") 
+    // http://localhost:8081/SpringMVC/servlet/deleteEntrepriseById/1
+    @DeleteMapping("/deleteEntrepriseById/{identreprise}") 
 	@ResponseBody 
-	public void deleteEmployeById(@PathVariable("idemp")int employeId) {
-		iemployeservice.deleteEmployeById(employeId);
-		
-	}
-    
-    @DeleteMapping("/deleteContratById/{idcontrat}") 
-	@ResponseBody
-	public void deleteContratById(@PathVariable("idcontrat")int contratId) {
-		iemployeservice.deleteContratById(contratId);
+	public void deleteEntrepriseById(@PathVariable("identreprise")int entrepriseId)
+	{
+		ientrepriseservice.deleteEntrepriseById(entrepriseId);
 	}
 
-    
-    @GetMapping(value = "getNombreEmployeJPQL")
+    // http://localhost:8081/SpringMVC/servlet/getEntrepriseById/1
+    @GetMapping(value = "getEntrepriseById/{identreprise}")
     @ResponseBody
-	public int getNombreEmployeJPQL() {
-		
-		return iemployeservice.getNombreEmployeJPQL();
+	public Entreprise getEntrepriseById(@PathVariable("identreprise") int entrepriseId) {
+
+		return ientrepriseservice.getEntrepriseById(entrepriseId);
 	}
 
+    // http://localhost:8081/SpringMVC/servlet/ajouterDepartement
+ 	//{"id":1,"name":"Telecom"}
 
-    @GetMapping(value = "getAllEmployeNamesJPQL")
-    @ResponseBody
-	public List<String> getAllEmployeNamesJPQL() {
-		
-		return iemployeservice.getAllEmployeNamesJPQL();
-	}
-
-    @GetMapping(value = "getAllEmployeByEntreprise/{identreprise}")
-    @ResponseBody
-	public List<Employe> getAllEmployeByEntreprise(@PathVariable("identreprise") int identreprise) {
-    	Entreprise entreprise=ientrepriseservice.getEntrepriseById(identreprise);
-		return iemployeservice.getAllEmployeByEntreprise(entreprise);
-	}
-
- 	@PutMapping(value = "/mettreAjourEmailByEmployeIdJPQL/{id}/{newemail}") 
+ 	@PostMapping("/ajouterDepartement")
  	@ResponseBody
-	public void mettreAjourEmailByEmployeIdJPQL(@PathVariable("newemail") String email, @PathVariable("id") int employeId) {	
-	iemployeservice.mettreAjourEmailByEmployeIdJPQL(email, employeId);
-		
+	public int ajouterDepartement(@RequestBody Departement dep) {
+		return ientrepriseservice.ajouterDepartement(dep);
 	}
 
-    @DeleteMapping("/deleteAllContratJPQL") 
-	@ResponseBody
-	public void deleteAllContratJPQL() {
-		iemployeservice.deleteAllContratJPQL();
-		
-	}
-
-    @GetMapping(value = "getSalaireByEmployeIdJPQL/{idemp}")
+ 	 // http://localhost:8081/SpringMVC/servlet/getAllDepartementsNamesByEntreprise/1
+    @GetMapping(value = "getAllDepartementsNamesByEntreprise/{identreprise}")
     @ResponseBody
-	public float getSalaireByEmployeIdJPQL(@PathVariable("idemp")int employeId) {
-		return iemployeservice.getSalaireByEmployeIdJPQL(employeId);
+	public List<String> getAllDepartementsNamesByEntreprise(@PathVariable("identreprise") int entrepriseId) {
+		return ientrepriseservice.getAllDepartementsNamesByEntreprise(entrepriseId);
 	}
 
-    @GetMapping(value = "getSalaireMoyenByDepartementId/{iddept}")
-    @ResponseBody
-	public Double getSalaireMoyenByDepartementId(@PathVariable("iddept")int departementId) {
-		return iemployeservice.getSalaireMoyenByDepartementId(departementId);
+    // URL : http://localhost:8081/SpringMVC/servlet/deleteDepartementById/3
+    @DeleteMapping("/deleteDepartementById/{iddept}") 
+	@ResponseBody 
+	public void deleteDepartementById(@PathVariable("iddept") int depId) {
+		ientrepriseservice.deleteDepartementById(depId);
+
 	}
-
-	
-
-	public List<Timesheet> getTimesheetsByMissionAndDate(Employe employe, Mission mission, Date dateDebut,
-			Date dateFin) {
-		return iemployeservice.getTimesheetsByMissionAndDate(employe, mission, dateDebut, dateFin);
-	}
-
-
-	
-	@GetMapping(value = "/getAllEmployes")
-    @ResponseBody
-	public List<Employe> getAllEmployes() {
-		
-		return iemployeservice.getAllEmployes();
-	}
-
-	
-
-	
-
-}
